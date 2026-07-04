@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GrabWay - E-commerce Application
+
+A full-featured e-commerce web application for selling honey and home essentials, built with Next.js 15, TypeScript, Tailwind CSS, PostgreSQL, and Razorpay payments.
+
+## Tech Stack
+
+- **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS v4, shadcn/ui components
+- **Backend**: Next.js API Routes (Route Handlers)
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: Auth.js v5 (NextAuth) with credentials + Google OAuth
+- **Payments**: Razorpay (UPI, Cards, NetBanking)
+- **State Management**: Zustand (cart persistence)
+- **Deployment**: Hostinger VPS (standalone build)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+ 
+- PostgreSQL database
+- Razorpay account (for payments)
+- Cloudinary account (for image hosting, optional)
+
+### Installation
+
+1. **Clone and install dependencies:**
+   ```bash
+   cd ecommerce
+   npm install
+   ```
+
+2. **Set up environment variables:**
+   ```bash
+   cp .env.example .env
+   ```
+   Fill in your database URL and API keys in `.env`.
+
+3. **Set up the database:**
+   ```bash
+   npm run db:generate
+   npm run db:push
+   ```
+
+4. **Seed the database with sample data:**
+   ```bash
+   npm run db:seed
+   ```
+
+5. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Default Credentials
+
+- **Admin**: admin@grabway.in / admin123
+- **Admin Dashboard**: http://localhost:3000/admin
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── (storefront)/     # Customer pages (products, cart, checkout, orders)
+│   ├── (auth)/           # Authentication pages (login, signup, forgot-password)
+│   ├── admin/            # Admin dashboard (products, categories, orders, users, coupons)
+│   └── api/              # API route handlers
+├── components/
+│   ├── ui/               # Reusable UI components (Button, Input, Card, Badge)
+│   ├── layout/           # Header, Footer
+│   └── products/         # Product card component
+├── lib/                  # Utilities (prisma client, auth config, razorpay, helpers)
+├── store/                # Zustand stores (cart)
+└── types/                # TypeScript types
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Customer Features
+- Product browsing with search and category filters
+- Product details with image gallery and reviews
+- Shopping cart (persisted in localStorage)
+- Checkout with address, coupon codes, and tax calculation
+- Razorpay payment (UPI, Cards, NetBanking)
+- Order tracking with status timeline
+- Wishlist
+- User authentication (email/password + Google OAuth)
+- Password reset via email
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Admin Features
+- Dashboard with stats (products, orders, revenue, users)
+- Product CRUD (add, edit, delete with images)
+- Category management (hierarchical)
+- Order management (view, update status)
+- User management
+- Coupon creation and management
 
-## Learn More
+## Deployment (Hostinger VPS)
 
-To learn more about Next.js, take a look at the following resources:
+1. Build for production:
+   ```bash
+   npm run build
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. The `standalone` output is in `.next/standalone/`. Deploy with PM2:
+   ```bash
+   pm2 start .next/standalone/server.js --name grabway
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Set up Nginx as reverse proxy and Let's Encrypt for SSL.
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run db:generate` | Generate Prisma client |
+| `npm run db:migrate` | Run database migrations |
+| `npm run db:push` | Push schema to database |
+| `npm run db:seed` | Seed database with sample data |
+| `npm run db:studio` | Open Prisma Studio GUI |
