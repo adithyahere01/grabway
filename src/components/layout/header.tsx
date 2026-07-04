@@ -123,19 +123,19 @@ export function Header() {
                 >
                   <div className="w-8 h-8 bg-honey-500 rounded-full flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">
-                      {session.user.name?.charAt(0).toUpperCase() || "U"}
+                      {session.user?.name?.charAt(0).toUpperCase() || "U"}
                     </span>
                   </div>
                   <span className="hidden sm:block text-sm font-medium max-w-[100px] truncate">
-                    {session.user.name?.split(" ")[0] || "Account"}
+                    {session.user?.name?.split(" ")[0] || "Account"}
                   </span>
                 </button>
 
                 {userMenuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-border py-2 z-50">
                     <div className="px-4 py-2 border-b border-border">
-                      <p className="text-sm font-medium truncate">{session.user.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
+                      <p className="text-sm font-medium truncate">{session.user?.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{session.user?.email}</p>
                     </div>
 
                     <Link
