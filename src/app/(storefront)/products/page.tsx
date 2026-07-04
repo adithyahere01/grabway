@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, Grid3X3, List } from "lucide-react";
@@ -27,7 +27,7 @@ interface Category {
   _count: { products: number };
 }
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -240,5 +240,25 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="container py-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="aspect-square bg-muted rounded-xl" />
+              <div className="mt-3 h-4 bg-muted rounded w-3/4" />
+              <div className="mt-2 h-4 bg-muted rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Package, Clock, Truck, CheckCircle, XCircle, ArrowLeft, MapPin } from "lucide-react";
@@ -49,7 +49,7 @@ const statusConfig: Record<string, { icon: typeof Package; label: string; color:
   CANCELLED: { icon: XCircle, label: "Cancelled", color: "destructive" },
 };
 
-export default function OrderDetailPage() {
+function OrderDetailContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const isSuccess = searchParams.get("success") === "true";
@@ -250,5 +250,21 @@ export default function OrderDetailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OrderDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="container py-8">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="h-8 bg-muted rounded w-48 animate-pulse" />
+          <div className="h-40 bg-muted rounded-xl animate-pulse" />
+          <div className="h-60 bg-muted rounded-xl animate-pulse" />
+        </div>
+      </div>
+    }>
+      <OrderDetailContent />
+    </Suspense>
   );
 }
