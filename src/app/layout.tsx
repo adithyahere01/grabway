@@ -25,15 +25,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <head>
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
-      </head>
       <body className="min-h-full flex flex-col">
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       </body>
     </html>
   );
