@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -22,9 +24,18 @@ function LoginContent() {
 
   useEffect(() => {
     if (status === "authenticated") {
+      const user = session?.user as { emailVerified?: Date | null } | undefined;
+      if (!user?.emailVerified) {
+        toast({
+          variant: "warning",
+          title: "Email not verified",
+          description: "Please verify your email address. Check your inbox for a verification link.",
+          duration: 10000,
+        });
+      }
       router.replace("/account");
     }
-  }, [status, router]);
+  }, [status, session, router, toast]);
 
   useEffect(() => {
     if (searchParams.get("verified") === "true") {
@@ -51,10 +62,15 @@ function LoginContent() {
     });
 
     if (result?.error) {
-      if (result.error.includes("EMAIL_NOT_VERIFIED")) {
-        setError("Please verify your email before signing in.");
+      const code = (result as { code?: string }).code || result.error;
+      if (code === "USER_NOT_FOUND") {
+        setError("No account found with this email. Please sign up first.");
+      } else if (code === "NO_PASSWORD") {
+        setError("This account uses Google sign-in. Please use the Google button below.");
+      } else if (code === "INVALID_PASSWORD") {
+        setError("Incorrect password. Please try again.");
       } else {
-        setError("Invalid email or password");
+        setError("Invalid email or password. Please try again.");
       }
       setLoading(false);
     } else {
@@ -96,12 +112,20 @@ function LoginContent() {
             {error && (
               <div className="p-3 rounded-md bg-red-50 border border-red-200 text-sm text-red-700">
                 {error}
-                {error.includes("verify your email") && (
+                {error.includes("sign up first") && (
                   <Link
-                    href={`/verify-email?email=${encodeURIComponent(formData.email)}`}
+                    href="/signup"
                     className="block mt-2 font-medium text-red-800 hover:underline"
                   >
-                    Resend verification email
+                    Create an account →
+                  </Link>
+                )}
+                {error.includes("Incorrect password") && (
+                  <Link
+                    href="/forgot-password"
+                    className="block mt-2 font-medium text-red-800 hover:underline"
+                  >
+                    Reset your password
                   </Link>
                 )}
               </div>
