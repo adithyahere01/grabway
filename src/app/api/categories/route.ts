@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(categories);
   } catch (error) {
-    console.error("Categories GET error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Categories GET error:", error instanceof Error ? error.message : error, error instanceof Error ? error.stack : "");
+    return NextResponse.json({ error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
   }
 }
 

@@ -64,8 +64,8 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Products GET error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Products GET error:", error instanceof Error ? error.message : error, error instanceof Error ? error.stack : "");
+    return NextResponse.json({ error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
   }
 }
 

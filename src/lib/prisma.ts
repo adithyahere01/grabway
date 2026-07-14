@@ -6,7 +6,14 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  const adapter = new PrismaMariaDb(process.env.DATABASE_URL!);
+  const url = new URL(process.env.DATABASE_URL!);
+  const adapter = new PrismaMariaDb({
+    host: url.hostname,
+    port: parseInt(url.port || "3306", 10),
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
+    database: url.pathname.slice(1),
+  });
   return new PrismaClient({ adapter });
 }
 
