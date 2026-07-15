@@ -15,9 +15,7 @@ class CustomAuthError extends CredentialsSignin {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma) as never,
   session: { strategy: "jwt" },
-  logger: {
-    error: () => {},
-  },
+  trustHost: true,
   pages: {
     signIn: "/login",
     error: "/login",
