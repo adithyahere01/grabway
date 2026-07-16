@@ -9,12 +9,14 @@ import {
   Users,
   Tag,
   BarChart3,
+  FileImage,
 } from "lucide-react";
 
 const adminNav = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Categories", href: "/admin/categories", icon: FolderTree },
+  { name: "Showcases", href: "/admin/showcases", icon: FileImage },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Coupons", href: "/admin/coupons", icon: Tag },

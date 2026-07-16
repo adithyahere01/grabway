@@ -82,7 +82,7 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm text-forest-200">
-              <li><Link href="/products" className="hover:text-honey-400 transition-colors">All Products</Link></li>
+              <li><Link href="/products" className="hover:text-honey-400 transition-colors">Our Products</Link></li>
               <li><Link href="/naturals" className="hover:text-honey-400 transition-colors">Grabway Naturals</Link></li>
               <li><Link href="/essentials" className="hover:text-honey-400 transition-colors">Grabway Essentials</Link></li>
               <li><Link href="/about" className="hover:text-honey-400 transition-colors">About Us</Link></li>

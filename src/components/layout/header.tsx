@@ -24,7 +24,7 @@ const navigation = [
   { name: "Home", href: "/" },
   { name: "Grabway Naturals", href: "/naturals" },
   { name: "Grabway Essentials", href: "/essentials" },
-  { name: "All Products", href: "/products" },
+  { name: "Our Products", href: "/products" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
