@@ -7,30 +7,20 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient() {
   const dbUrl = process.env.DATABASE_URL!;
-  let adapterConfig: Record<string, unknown>;
+  const url = new URL(dbUrl);
 
-  if (dbUrl.startsWith("mysql://") || dbUrl.startsWith("mariadb://")) {
-    const url = new URL(dbUrl);
-    adapterConfig = {
-      host: url.hostname || "localhost",
-      port: parseInt(url.port || "3306", 10),
-      user: decodeURIComponent(url.username),
-      password: decodeURIComponent(url.password),
-      database: url.pathname.slice(1),
-    };
-  } else {
-    adapterConfig = { socketPath: dbUrl };
-  }
+  const adapterConfig = {
+    host: url.hostname || "localhost",
+    port: parseInt(url.port || "3306", 10),
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
+    database: url.pathname.slice(1),
+    connectTimeout: 30000,
+  };
 
-  if (process.env.DATABASE_SOCKET) {
-    adapterConfig.socketPath = process.env.DATABASE_SOCKET;
-    delete adapterConfig.host;
-    delete adapterConfig.port;
-  }
+  console.log("DB connecting to:", adapterConfig.host, "port:", adapterConfig.port, "database:", adapterConfig.database);
 
-  console.log("DB connecting to:", adapterConfig.host || adapterConfig.socketPath, "database:", adapterConfig.database);
-
-  const adapter = new PrismaMariaDb(adapterConfig as never);
+  const adapter = new PrismaMariaDb(adapterConfig);
   return new PrismaClient({ adapter });
 }
 
