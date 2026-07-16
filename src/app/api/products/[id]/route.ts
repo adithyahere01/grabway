@@ -67,7 +67,26 @@ export async function PUT(
       include: { images: true, category: true },
     });
 
-    return NextResponse.json(product);
+    if (body.images && Array.isArray(body.images)) {
+      await prisma.productImage.deleteMany({ where: { productId: id } });
+
+      if (body.images.length > 0) {
+        await prisma.productImage.createMany({
+          data: body.images.map((img: { url: string }, index: number) => ({
+            productId: id,
+            url: img.url,
+            position: index,
+          })),
+        });
+      }
+    }
+
+    const updated = await prisma.product.findUnique({
+      where: { id },
+      include: { images: { orderBy: { position: "asc" } }, category: true },
+    });
+
+    return NextResponse.json(updated);
   } catch (error) {
     console.error("Product PUT error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

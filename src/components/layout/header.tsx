@@ -56,11 +56,6 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-border">
-      {/* Top announcement bar */}
-      <div className="bg-forest-700 text-white text-center py-2 text-xs sm:text-sm">
-        <p>Free Shipping on orders above ₹500 | Additional 3% Off on UPI Payments</p>
-      </div>
-
       {/* Main header */}
       <div className="container">
           <div className="flex items-center justify-between h-20">

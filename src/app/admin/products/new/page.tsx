@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, X, ImagePlus } from "lucide-react";
 
 interface Category {
   id: string;
@@ -29,7 +29,33 @@ export default function NewProductPage() {
     isFeatured: false,
     gstRate: "12",
   });
-  const [imageUrls, setImageUrls] = useState<string[]>([""]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (res.ok) {
+        setImageUrls((prev) => [...prev, data.url]);
+      } else {
+        alert(data.error || "Upload failed");
+      }
+    } catch {
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   useEffect(() => {
     fetch("/api/categories")
@@ -115,37 +141,54 @@ export default function NewProductPage() {
                 <CardTitle className="text-base">Images</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {imageUrls.map((url, i) => (
-                  <div key={i} className="flex gap-2">
-                    <Input
-                      value={url}
-                      onChange={(e) => {
-                        const newUrls = [...imageUrls];
-                        newUrls[i] = e.target.value;
-                        setImageUrls(newUrls);
-                      }}
-                      placeholder="Image URL (Cloudinary or external URL)"
-                    />
-                    {imageUrls.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setImageUrls(imageUrls.filter((_, idx) => idx !== i))}
-                      >
-                        ×
-                      </Button>
-                    )}
+                {imageUrls.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {imageUrls.map((url, i) => (
+                      <div key={i} className="relative group rounded-md overflow-hidden border border-border aspect-square">
+                        <img
+                          src={url}
+                          alt={`Product image ${i + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setImageUrls(imageUrls.filter((_, idx) => idx !== i))
+                          }
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setImageUrls([...imageUrls, ""])}
-                >
-                  <Upload className="h-3 w-3 mr-1" /> Add Image URL
-                </Button>
+                )}
+                <div>
+                  <input
+                    type="file"
+                    id="image-upload-new"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={uploading}
+                    onClick={() => document.getElementById("image-upload-new")?.click()}
+                  >
+                    {uploading ? (
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    ) : (
+                      <ImagePlus className="h-3 w-3 mr-1" />
+                    )}
+                    {uploading ? "Uploading..." : "Upload Image"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    JPEG, PNG, or WebP. Max 5MB.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
