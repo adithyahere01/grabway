@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, description, price, compareAtPrice, sku, stock, weight, categoryId, images, isFeatured, gstRate, brand } = body;
+    const { name, description, price, compareAtPrice, sku, stock, weight, weightUnit, categoryId, images, isFeatured, gstRate, brand } = body;
 
     if (!name || !price) {
       return NextResponse.json({ error: "Name and price are required" }, { status: 400 });
@@ -95,9 +95,10 @@ export async function POST(req: NextRequest) {
         description,
         price,
         compareAtPrice,
-        sku,
+        sku: sku || null,
         stock: stock || 0,
         weight,
+        weightUnit: weightUnit || "grams",
         categoryId,
         isFeatured: isFeatured || false,
         gstRate: gstRate || 12,

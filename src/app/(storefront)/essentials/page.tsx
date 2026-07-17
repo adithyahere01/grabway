@@ -90,7 +90,7 @@ export default function EssentialsPage() {
           />
         </div>
         <p className="mt-2 text-muted-foreground max-w-xl mx-auto">
-          Quality home and kitchen essentials for everyday living. 
+          Grabway Life Essentials — quality home and kitchen essentials for everyday living. 
           Thoughtfully curated products that make your daily life simpler.
         </p>
       </div>

@@ -235,15 +235,6 @@ export default function ProductDetailPage() {
           </div>
           <p className="text-xs text-muted-foreground mt-1">Inclusive of all taxes</p>
 
-          {/* Stock Status */}
-          <div className="mt-4">
-            {product.stock > 0 ? (
-              <Badge variant="success">In Stock ({product.stock} available)</Badge>
-            ) : (
-              <Badge variant="destructive">Out of Stock</Badge>
-            )}
-          </div>
-
           {/* Description */}
           {product.description && (
             <div className="mt-6 prose prose-sm max-w-none text-forest-700">

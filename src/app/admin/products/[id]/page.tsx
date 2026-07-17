@@ -31,6 +31,7 @@ interface Product {
   sku: string | null;
   stock: number;
   weight: number | null;
+  weightUnit: string;
   brand: string;
   categoryId: string | null;
   isActive: boolean;
@@ -57,6 +58,7 @@ export default function EditProductPage() {
     sku: "",
     stock: "0",
     weight: "",
+    weightUnit: "grams",
     categoryId: "",
     isActive: true,
     isFeatured: false,
@@ -108,6 +110,7 @@ export default function EditProductPage() {
           sku: product.sku || "",
           stock: String(product.stock),
           weight: product.weight ? String(product.weight) : "",
+          weightUnit: product.weightUnit || "grams",
           categoryId: product.categoryId || "",
           isActive: product.isActive,
           isFeatured: product.isFeatured,
@@ -418,15 +421,29 @@ export default function EditProductPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="weight">Weight (grams)</Label>
-                  <Input
-                    id="weight"
-                    type="number"
-                    step="0.01"
-                    value={form.weight}
-                    onChange={(e) => setForm({ ...form, weight: e.target.value })}
-                    placeholder="500"
-                  />
+                  <Label htmlFor="weight">Weight / Volume</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="weight"
+                      type="number"
+                      step="0.01"
+                      value={form.weight}
+                      onChange={(e) => setForm({ ...form, weight: e.target.value })}
+                      placeholder="500"
+                      className="flex-1"
+                    />
+                    <select
+                      value={form.weightUnit}
+                      onChange={(e) => setForm({ ...form, weightUnit: e.target.value })}
+                      className="px-3 py-2 border border-input rounded-md bg-background text-sm"
+                    >
+                      <option value="grams">Grams</option>
+                      <option value="kilograms">Kilograms</option>
+                      <option value="liter">Liter</option>
+                      <option value="milliliter">Milliliter</option>
+                      <option value="unit">Unit</option>
+                    </select>
+                  </div>
                 </div>
               </CardContent>
             </Card>

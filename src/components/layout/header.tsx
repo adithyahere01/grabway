@@ -76,7 +76,7 @@ export function Header() {
             />
           </Link>
 
-          {/* Desktop Search */}
+          {/* Desktop Search - commented out for now
           <div className="hidden lg:flex flex-1 max-w-md mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -86,15 +86,17 @@ export function Header() {
               />
             </div>
           </div>
+          */}
 
           {/* Right actions */}
           <div className="flex items-center gap-1 sm:gap-2">
-            <button
+            {/* Mobile search icon - commented out for now */}
+            {/*<button
               className="lg:hidden p-2"
               onClick={() => setSearchOpen(!searchOpen)}
             >
               <Search className="h-5 w-5" />
-            </button>
+            </button>*/}
 
             <Link href="/wishlist" className="p-2 hover:text-primary transition-colors">
               <Heart className="h-5 w-5" />
@@ -198,8 +200,8 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile search */}
-        {searchOpen && (
+        {/* Mobile search - commented out for now */}
+        {/*searchOpen && (
           <div className="lg:hidden pb-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -210,7 +212,7 @@ export function Header() {
               />
             </div>
           </div>
-        )}
+        )*/}
       </div>
 
       {/* Desktop Navigation */}

@@ -2,38 +2,43 @@ import Link from "next/link";
 import { ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-const categories = [
-  { name: "Raw Honey", slug: "raw-honey", icon: "🍯", description: "Unprocessed pure honey" },
-  { name: "Flavored Honey", slug: "flavored-honey", icon: "🌸", description: "Infused with natural flavors" },
-  { name: "Honey Combos", slug: "honey-combos", icon: "🎁", description: "Gift sets & bundles" },
-  { name: "Beeswax Products", slug: "beeswax-products", icon: "🕯️", description: "Candles & skincare" },
-  { name: "Home Essentials", slug: "home-essentials", icon: "🏠", description: "Daily home needs" },
-  { name: "Kitchen Items", slug: "kitchen-items", icon: "🍳", description: "Jars, containers & more" },
-];
+import { prisma } from "@/lib/prisma";
 
 const testimonials = [
   {
     name: "Priya Sharma",
-    location: "Delhi",
+    location: "Coimbatore",
     rating: 5,
     comment: "The raw honey is absolutely pure and tastes amazing. I've been ordering for 6 months now and the quality is consistent every time.",
   },
   {
     name: "Rajesh Kumar",
-    location: "Mumbai",
+    location: "Thiruppur",
     rating: 5,
     comment: "Best honey I've ever tasted. You can tell it's genuine. The delivery was fast and packaging was excellent.",
   },
   {
     name: "Anita Patel",
-    location: "Bangalore",
+    location: "Erode",
     rating: 5,
     comment: "Love the variety of products. The honey gift set was perfect for Diwali gifting. Will definitely order again!",
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [bestsellers, categories] = await Promise.all([
+    prisma.product.findMany({
+      where: { isFeatured: true, isActive: true },
+      include: { images: { orderBy: { position: "asc" }, take: 1 } },
+      take: 8,
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.category.findMany({
+      where: { showOnHomepage: true, isActive: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
+
   return (
     <div>
       {/* Brand Navigation */}
@@ -44,8 +49,8 @@ export default function HomePage() {
               href="/naturals"
               className="group flex flex-col items-center gap-3"
             >
-              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-white border-2 border-honey-300 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all overflow-hidden p-3">
-                <img src="/logos/grabway-naturals.png" alt="Grabway Naturals" className="w-full h-full object-contain" />
+              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-white border-2 border-honey-300 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all overflow-hidden">
+                <img src="/logos/grabway-naturals.png" alt="Grabway Naturals" className="w-full h-full object-cover" />
               </div>
               <span className="text-sm md:text-base font-semibold text-forest-900 group-hover:text-honey-700 transition-colors">
                 Grabway Naturals
@@ -95,11 +100,6 @@ export default function HomePage() {
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </Link>
-              <Link href="/products?category=honey-combos">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  View Gift Sets
-                </Button>
-              </Link>
             </div>
             <div className="mt-8 flex items-center gap-6 text-sm text-forest-600">
               <div className="flex items-center gap-1">
@@ -108,41 +108,45 @@ export default function HomePage() {
                 </svg>
                 Free delivery above ₹500
               </div>
-              <div className="flex items-center gap-1">
-                <svg className="w-5 h-5 text-forest-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                COD Available
-              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section className="container py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-forest-900">Shop by Category</h2>
-          <p className="mt-2 text-muted-foreground">
-            Browse our curated collections of honey and home essentials
-          </p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/products?category=${cat.slug}`}
-              className="group p-6 rounded-xl border border-border bg-white hover:border-honey-300 hover:shadow-md transition-all text-center"
-            >
-              <div className="text-4xl mb-3">{cat.icon}</div>
-              <h3 className="font-semibold text-sm text-forest-900 group-hover:text-honey-700 transition-colors">
-                {cat.name}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-1">{cat.description}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {categories.length > 0 && (
+        <section className="container py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-forest-900">Shop by Category</h2>
+            <p className="mt-2 text-muted-foreground">
+              Browse our curated collections of honey and home essentials
+            </p>
+          </div>
+          <div className={`grid grid-cols-2 md:grid-cols-3 ${categories.length >= 6 ? "lg:grid-cols-6" : categories.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-4`}>
+            {categories.map((cat) => (
+              <Link
+                key={cat.slug}
+                href={`/products?category=${cat.slug}`}
+                className="group p-6 rounded-xl border border-border bg-white hover:border-honey-300 hover:shadow-md transition-all text-center"
+              >
+                {cat.image ? (
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-lg overflow-hidden">
+                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="text-4xl mb-3">🏷️</div>
+                )}
+                <h3 className="font-semibold text-sm text-forest-900 group-hover:text-honey-700 transition-colors">
+                  {cat.name}
+                </h3>
+                {cat.description && (
+                  <p className="text-xs text-muted-foreground mt-1">{cat.description}</p>
+                )}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Product Highlights */}
       <section className="container py-16">
@@ -198,64 +202,74 @@ export default function HomePage() {
       </section>
 
       {/* Featured Products Section */}
-      <section className="bg-cream-50 py-16">
-        <div className="container">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-forest-900">Bestsellers</h2>
-              <p className="mt-1 text-muted-foreground">Our most loved products</p>
-            </div>
-            <Link href="/products">
-              <Button variant="outline" size="sm">
-                View All <ArrowRight className="h-3 w-3 ml-1" />
-              </Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {[
-              { name: "Wild Forest Honey", price: 449, comparePrice: 599, image: "🍯" },
-              { name: "Multiflora Raw Honey", price: 349, comparePrice: 499, image: "🌺" },
-              { name: "Honey Gift Set (Pack of 3)", price: 999, comparePrice: 1299, image: "🎁" },
-              { name: "Organic Beeswax Candle", price: 299, comparePrice: 399, image: "🕯️" },
-              { name: "Glass Honey Jar 500ml", price: 199, comparePrice: 249, image: "🫙" },
-              { name: "Tulsi Infused Honey", price: 399, comparePrice: 549, image: "🌿" },
-              { name: "Cinnamon Honey", price: 379, comparePrice: 499, image: "🍂" },
-              { name: "Kitchen Storage Set", price: 799, comparePrice: 999, image: "🏺" },
-            ].map((product, i) => (
-              <Link
-                key={i}
-                href="/products"
-                className="group bg-white rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all"
-              >
-                <div className="aspect-square bg-gradient-to-br from-honey-50 to-cream-100 flex items-center justify-center text-6xl relative">
-                  {product.image}
-                  {product.comparePrice > product.price && (
-                    <Badge className="absolute top-3 left-3" variant="destructive">
-                      {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
-                    </Badge>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-medium text-sm text-forest-900 group-hover:text-honey-700 transition-colors line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="font-bold text-forest-900">₹{product.price}</span>
-                    {product.comparePrice > product.price && (
-                      <span className="text-sm text-muted-foreground line-through">
-                        ₹{product.comparePrice}
-                      </span>
-                    )}
-                  </div>
-                  <Button size="sm" className="w-full mt-3" variant="outline">
-                    Add to Cart
-                  </Button>
-                </div>
+      {bestsellers.length > 0 && (
+        <section className="bg-cream-50 py-16">
+          <div className="container">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-forest-900">Bestsellers</h2>
+                <p className="mt-1 text-muted-foreground">Our most loved products</p>
+              </div>
+              <Link href="/products">
+                <Button variant="outline" size="sm">
+                  View All <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
               </Link>
-            ))}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {bestsellers.map((product) => {
+                const price = Number(product.price);
+                const compareAtPrice = product.compareAtPrice ? Number(product.compareAtPrice) : null;
+                const discount = compareAtPrice && compareAtPrice > price
+                  ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
+                  : 0;
+                const imageUrl = product.images[0]?.url;
+
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/products/${product.slug}`}
+                    className="group bg-white rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all"
+                  >
+                    <div className="aspect-square bg-gradient-to-br from-honey-50 to-cream-100 flex items-center justify-center relative overflow-hidden">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-6xl">🍯</span>
+                      )}
+                      {discount > 0 && (
+                        <Badge className="absolute top-3 left-3" variant="destructive">
+                          {discount}% OFF
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-medium text-sm text-forest-900 group-hover:text-honey-700 transition-colors line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="font-bold text-forest-900">₹{price}</span>
+                        {compareAtPrice && compareAtPrice > price && (
+                          <span className="text-sm text-muted-foreground line-through">
+                            ₹{compareAtPrice}
+                          </span>
+                        )}
+                      </div>
+                      <Button size="sm" className="w-full mt-3" variant="outline">
+                        View Product
+                      </Button>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Why Choose Us */}
       <section className="container py-16">
@@ -272,7 +286,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h4 className="font-semibold">Sourced Directly from Beekeepers</h4>
-                    <p className="text-sm text-forest-200">No middlemen. Farm-fresh honey delivered to your home.</p>
+                    <p className="text-sm text-forest-200">Farm-fresh honey delivered to your home.</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -294,7 +308,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h4 className="font-semibold">Eco-Friendly Packaging</h4>
-                    <p className="text-sm text-forest-200">Glass jars and recyclable materials. Good for you and the planet.</p>
+                    <p className="text-sm text-forest-200">Recyclable materials. Good for you and the planet.</p>
                   </div>
                 </li>
               </ul>
@@ -337,9 +351,9 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="container py-16">
         <div className="bg-gradient-to-r from-honey-500 to-honey-600 rounded-2xl p-8 md:p-12 text-center text-white">
-          <h2 className="text-3xl font-bold">Get 10% Off Your First Order</h2>
+          <h2 className="text-3xl font-bold">Get Seasonal Offers & New Arrivals</h2>
           <p className="mt-2 text-honey-100 max-w-md mx-auto">
-            Sign up for our newsletter and get an exclusive discount code for your first purchase.
+            Subscribe to our newsletter and be the first to know about seasonal deals, fresh arrivals, and exclusive drops.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input

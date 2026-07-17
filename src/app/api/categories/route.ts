@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name, description, image, parentId, brand } = await req.json();
+    const { name, description, image, parentId, brand, showOnHomepage } = await req.json();
 
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     const slug = slugify(name, { lower: true, strict: true });
 
     const category = await prisma.category.create({
-      data: { name, slug, description, image, parentId, brand: brand || null },
+      data: { name, slug, description, image, parentId, brand: brand || null, showOnHomepage: showOnHomepage || false },
     });
 
     return NextResponse.json(category, { status: 201 });

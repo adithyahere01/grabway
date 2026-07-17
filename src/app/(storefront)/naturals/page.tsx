@@ -88,8 +88,8 @@ export default function NaturalsPage() {
           className="h-28 md:h-36 mx-auto mb-4"
         />
         <p className="mt-2 text-muted-foreground max-w-xl mx-auto">
-          Pure, organic honey sourced directly from trusted beekeepers across India. 
-          100% natural, NMR tested, and certified organic.
+          Raw, unprocessed honey sourced directly from trusted beekeepers across India.
+          100% natural with no added sugars, preservatives, or artificial flavours.
         </p>
       </div>
 

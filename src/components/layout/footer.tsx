@@ -7,15 +7,15 @@ export function Footer() {
       {/* Trust badges */}
       <div className="border-b border-forest-700">
         <div className="container py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
             <div>
               <div className="w-12 h-12 bg-honey-500 rounded-full flex items-center justify-center mx-auto mb-2">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h4 className="font-semibold text-sm">100% Pure</h4>
-              <p className="text-xs text-forest-200 mt-1">Natural Products</p>
+              <h4 className="font-semibold text-sm">100% Raw</h4>
+              <p className="text-xs text-forest-200 mt-1">Unprocessed</p>
             </div>
             <div>
               <div className="w-12 h-12 bg-honey-500 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -34,15 +34,6 @@ export function Footer() {
               </div>
               <h4 className="font-semibold text-sm">Secure Payments</h4>
               <p className="text-xs text-forest-200 mt-1">UPI, Cards & More</p>
-            </div>
-            <div>
-              <div className="w-12 h-12 bg-honey-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </div>
-              <h4 className="font-semibold text-sm">Easy Returns</h4>
-              <p className="text-xs text-forest-200 mt-1">7-Day Return Policy</p>
             </div>
           </div>
         </div>
@@ -134,7 +125,6 @@ export function Footer() {
               <span className="px-2 py-1 bg-forest-800 rounded text-[10px]">UPI</span>
               <span className="px-2 py-1 bg-forest-800 rounded text-[10px]">VISA</span>
               <span className="px-2 py-1 bg-forest-800 rounded text-[10px]">MC</span>
-              <span className="px-2 py-1 bg-forest-800 rounded text-[10px]">COD</span>
             </div>
           </div>
         </div>

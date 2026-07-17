@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Loader2, Trash2 } from "lucide-react";
+import { Plus, Loader2, Trash2, ImagePlus } from "lucide-react";
 
 interface Category {
   id: string;
   name: string;
   slug: string;
   brand: string | null;
+  image: string | null;
+  showOnHomepage: boolean;
   _count: { products: number };
 }
 
@@ -20,7 +22,34 @@ export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [brandFilter, setBrandFilter] = useState<string>("ALL");
-  const [newCategory, setNewCategory] = useState({ name: "", description: "", brand: "" });
+  const [newCategory, setNewCategory] = useState({ name: "", description: "", brand: "", showOnHomepage: false });
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (res.ok) {
+        setImageUrl(data.url);
+      } else {
+        alert(data.error || "Upload failed");
+      }
+    } catch {
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -44,11 +73,14 @@ export default function AdminCategoriesPage() {
         name: newCategory.name,
         description: newCategory.description || undefined,
         brand: newCategory.brand || undefined,
+        showOnHomepage: newCategory.showOnHomepage,
+        image: imageUrl || undefined,
       }),
     });
 
     if (res.ok) {
-      setNewCategory({ name: "", description: "", brand: "" });
+      setNewCategory({ name: "", description: "", brand: "", showOnHomepage: false });
+      setImageUrl("");
       fetchCategories();
     }
     setLoading(false);
@@ -67,6 +99,19 @@ export default function AdminCategoriesPage() {
     } else {
       const err = await res.json();
       alert(err.error || "Failed to delete category");
+    }
+  };
+
+  const handleToggleHomepage = async (id: string, showOnHomepage: boolean) => {
+    const res = await fetch(`/api/categories/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ showOnHomepage }),
+    });
+    if (res.ok) {
+      fetchCategories();
+    } else {
+      alert("Failed to update category");
     }
   };
 
@@ -102,6 +147,49 @@ export default function AdminCategoriesPage() {
                 />
               </div>
               <div className="space-y-2">
+                <Label>Image</Label>
+                {imageUrl ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-border">
+                      <img src={imageUrl} alt="Category" className="w-full h-full object-cover" />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => setImageUrl("")}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="file"
+                      id="cat-image-upload"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploading}
+                      onClick={() => document.getElementById("cat-image-upload")?.click()}
+                    >
+                      {uploading ? (
+                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      ) : (
+                        <ImagePlus className="h-3 w-3 mr-1" />
+                      )}
+                      {uploading ? "Uploading..." : "Upload Image"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="catBrand">Brand *</Label>
                 <select
                   id="catBrand"
@@ -114,6 +202,16 @@ export default function AdminCategoriesPage() {
                   <option value="GRABWAY_NATURALS">Grabway Naturals</option>
                   <option value="GRABWAY_ESSENTIALS">Grabway Essentials</option>
                 </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="showOnHomepage"
+                  checked={newCategory.showOnHomepage}
+                  onChange={(e) => setNewCategory({ ...newCategory, showOnHomepage: e.target.checked })}
+                  className="rounded border-gray-300"
+                />
+                <Label htmlFor="showOnHomepage">Show on Homepage</Label>
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4 mr-1" />}
@@ -156,13 +254,27 @@ export default function AdminCategoriesPage() {
                       key={cat.id}
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
-                      <div>
-                        <p className="font-medium">{cat.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {cat._count.products} product{cat._count.products !== 1 ? "s" : ""}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        {cat.image ? (
+                          <div className="w-10 h-10 rounded-lg overflow-hidden border border-border flex-shrink-0">
+                            <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-cream-100 flex items-center justify-center flex-shrink-0 text-lg">
+                            🏷️
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium">{cat.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {cat._count.products} product{cat._count.products !== 1 ? "s" : ""}
+                          </p>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        {cat.showOnHomepage && (
+                          <Badge variant="warning">Homepage</Badge>
+                        )}
                         <Badge
                           variant={cat.brand === "GRABWAY_NATURALS" ? "success" : cat.brand === "GRABWAY_ESSENTIALS" ? "default" : "secondary"}
                         >
@@ -172,6 +284,15 @@ export default function AdminCategoriesPage() {
                             ? "Essentials"
                             : "No Brand"}
                         </Badge>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7"
+                          title={cat.showOnHomepage ? "Remove from homepage" : "Show on homepage"}
+                          onClick={() => handleToggleHomepage(cat.id, !cat.showOnHomepage)}
+                        >
+                          {cat.showOnHomepage ? "🏠" : "➕"}
+                        </Button>
                         <Button
                           size="icon"
                           variant="ghost"

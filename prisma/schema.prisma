@@ -108,9 +108,10 @@ model Category {
   parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children    Category[] @relation("CategoryHierarchy")
   products    Product[]
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  isActive       Boolean    @default(true)
+  showOnHomepage Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
   @@map("categories")
 }
@@ -125,6 +126,7 @@ model Product {
   sku            String?        @unique
   stock          Int            @default(0)
   weight         Decimal?       @db.Decimal(8, 2)
+  weightUnit     String         @default("grams")
   brand          Brand          @default(GRABWAY_NATURALS)
   categoryId     String?
   category       Category?      @relation(fields: [categoryId], references: [id])
