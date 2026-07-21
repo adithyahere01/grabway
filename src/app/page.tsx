@@ -26,7 +26,7 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
-  const [bestsellers, categories] = await Promise.all([
+  const [bestsellers, categories, blogPosts] = await Promise.all([
     prisma.product.findMany({
       where: { isFeatured: true, isActive: true },
       include: { images: { orderBy: { position: "asc" }, take: 1 } },
@@ -37,6 +37,12 @@ export default async function HomePage() {
       where: { showOnHomepage: true, isActive: true },
       orderBy: { name: "asc" },
     }),
+    prisma.blogPost?.findMany({
+      where: { isPublished: true, isFeatured: true },
+      orderBy: { publishedAt: "desc" },
+      take: 3,
+      select: { id: true, title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true },
+    }).catch(() => []) ?? Promise.resolve([]),
   ]);
 
   return (
@@ -347,6 +353,59 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Latest from Blog */}
+      {blogPosts.length > 0 && (
+        <section className="container py-16">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-forest-900">Latest from our Blog</h2>
+              <p className="mt-1 text-muted-foreground">Tips, stories, and updates</p>
+            </div>
+            <Link href="/blog">
+              <Button variant="outline" size="sm">
+                Read All Posts <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {blogPosts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/blog/${post.slug}`}
+                className="group bg-white rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all"
+              >
+                {post.coverImage && (
+                  <div className="aspect-[16/9] overflow-hidden">
+                    <img
+                      src={post.coverImage}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
+                <div className="p-5">
+                  <h3 className="font-semibold text-forest-900 group-hover:text-honey-700 transition-colors line-clamp-2">
+                    {post.title}
+                  </h3>
+                  {post.excerpt && (
+                    <p className="mt-2 text-sm text-forest-600 line-clamp-2">{post.excerpt}</p>
+                  )}
+                  {post.publishedAt && (
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      {new Date(post.publishedAt).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="container py-16">

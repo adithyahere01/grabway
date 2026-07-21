@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { renderContent } from "@/lib/render-content";
 
 interface Showcase {
   id: string;
@@ -10,45 +11,6 @@ interface Showcase {
   image: string;
   content: string;
   position: number;
-}
-
-function renderContent(content: string) {
-  const lines = content.split("\n");
-  const elements: React.ReactNode[] = [];
-  let bulletBuffer: string[] = [];
-
-  const flushBullets = () => {
-    if (bulletBuffer.length > 0) {
-      elements.push(
-        <ul key={`bullets-${elements.length}`} className="list-disc list-inside space-y-1 my-3 text-forest-700">
-          {bulletBuffer.map((item, i) => (
-            <li key={i}>{item}</li>
-          ))}
-        </ul>
-      );
-      bulletBuffer = [];
-    }
-  };
-
-  lines.forEach((line, i) => {
-    if (line.startsWith("- ")) {
-      bulletBuffer.push(line.slice(2));
-    } else {
-      flushBullets();
-      if (line.trim() === "") {
-        elements.push(<br key={`br-${i}`} />);
-      } else {
-        elements.push(
-          <p key={`p-${i}`} className="text-forest-700 leading-relaxed">
-            {line}
-          </p>
-        );
-      }
-    }
-  });
-
-  flushBullets();
-  return elements;
 }
 
 export default function OurProductsPage() {

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/cart";
 import { formatPrice, calculateDiscount } from "@/lib/utils";
+import { renderContent } from "@/lib/render-content";
 
 interface ProductDetail {
   id: string;
@@ -237,8 +238,8 @@ export default function ProductDetailPage() {
 
           {/* Description */}
           {product.description && (
-            <div className="mt-6 prose prose-sm max-w-none text-forest-700">
-              <p>{product.description}</p>
+            <div className="mt-6 prose prose-sm max-w-none">
+              {renderContent(product.description)}
             </div>
           )}
 
